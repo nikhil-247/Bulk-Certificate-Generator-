@@ -1,0 +1,13 @@
+import { ArrowRight, CheckCircle2, Clock3, Files, Plus, RefreshCw } from "lucide-react";
+import { Job } from "../lib/api";
+import { StatusBadge } from "../components/StatusBadge";
+export function Dashboard({ jobs, loading, onRefresh, onNew, onOpen }: { jobs: Job[]; loading: boolean; onRefresh: () => void; onNew: () => void; onOpen: (id: string) => void }) {
+  const total = jobs.reduce((n, j) => n + j.total_count, 0);
+  const completed = jobs.reduce((n, j) => n + j.success_count, 0);
+  const failed = jobs.reduce((n, j) => n + j.failed_count, 0);
+  return <section className="page"><div className="hero-row"><div><p className="eyebrow">OPERATIONS DASHBOARD</p><h1>Generate certificates at scale.</h1><p className="lede">Create one job, process every recipient in the background, and monitor exactly what succeeded or failed.</p></div><button className="primary" onClick={onNew}><Plus size={18}/> New generation</button></div>
+    <div className="stats-grid"><div className="stat-card"><div className="stat-icon blue"><Files size={18}/></div><span>Total recipients</span><strong>{total}</strong></div><div className="stat-card"><div className="stat-icon green"><CheckCircle2 size={18}/></div><span>Certificates generated</span><strong>{completed}</strong></div><div className="stat-card"><div className="stat-icon amber"><Clock3 size={18}/></div><span>Jobs</span><strong>{jobs.length}</strong></div><div className="stat-card"><div className="stat-icon red"><RefreshCw size={18}/></div><span>Failures</span><strong>{failed}</strong></div></div>
+    <div className="card"><div className="card-head"><div><h2>Generation jobs</h2><p>Every bulk request gets a traceable job ID.</p></div><button className="icon-btn" onClick={onRefresh} title="Refresh"><RefreshCw size={17}/></button></div>
+      {loading ? <div className="empty">Loading jobs...</div> : jobs.length === 0 ? <div className="empty"><div className="empty-icon"><Files/></div><h3>No jobs yet</h3><p>Create your first bulk certificate job to see progress here.</p><button className="secondary" onClick={onNew}>Create job</button></div> : <div className="table-wrap"><table><thead><tr><th>Job</th><th>Recipients</th><th>Result</th><th>Status</th><th></th></tr></thead><tbody>{jobs.map(j => <tr key={j.id} onClick={() => onOpen(j.id)}><td><strong>{j.event_name}</strong><small>{j.id.slice(0, 12)}… · {j.issuer_name}</small></td><td>{j.total_count}</td><td>{j.success_count} success · {j.failed_count} failed</td><td><StatusBadge status={j.status}/></td><td><ArrowRight size={17}/></td></tr>)}</tbody></table></div>}
+    </div></section>
+}
