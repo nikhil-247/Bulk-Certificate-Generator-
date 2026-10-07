@@ -1,0 +1,13 @@
+import os
+os.environ["DATABASE_URL"] = "sqlite:///./test_certificate_generator.db"
+os.environ["STORAGE_DIR"] = "./test_storage"
+
+import pytest
+from app.db.session import Base, engine
+
+@pytest.fixture(autouse=True)
+def reset_db():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
