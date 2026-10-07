@@ -19,7 +19,7 @@ Full-stack implementation of the Bulk Certificate Generator engineering assignme
 - Individual PDF retrieval and bulk ZIP download
 - Docker + Docker Compose
 - Pytest integration tests
-- GitHub Actions backend CI
+- GitHub Actions CI for backend tests and frontend production build
 
 ## Architecture
 
@@ -243,12 +243,12 @@ cd backend
 pytest -q
 ```
 
-The suite covers health, duplicate validation, job creation, PDF generation/retrieval, ZIP generation, certificate metadata, special characters, and individual failure isolation.
+The suite covers health, invalid-input validation, duplicate validation, job creation, PDF generation/retrieval, ZIP generation, certificate metadata, special characters, and individual failure isolation.
 
 Expected result:
 
 ```text
-6 passed
+7 passed
 ```
 
 ## Docker
@@ -265,7 +265,7 @@ Stop with `docker compose down`. Use `docker compose down -v` for a completely c
 
 ## CI
 
-`.github/workflows/ci.yml` installs Python 3.12, installs backend dependencies and runs `pytest -q` for pushes and pull requests to `main`.
+`.github/workflows/ci.yml` runs backend tests with Python 3.12 and builds the React/Vite frontend with Node.js 20 for pushes and pull requests to `main`.
 
 ## Interview design decisions
 
