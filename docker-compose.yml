@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: sqlite:////app/data/certificate_generator.db
+      CORS_ORIGINS: http://localhost:5173
+      STORAGE_DIR: /app/storage
+    volumes:
+      - backend_data:/app/data
+      - backend_storage:/app/storage
+    ports:
+      - "8000:8000"
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  backend_data:
+  backend_storage:
