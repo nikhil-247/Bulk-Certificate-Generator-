@@ -1,0 +1,14 @@
+import { useEffect } from "react";
+import { ArrowLeft, CheckCircle2, Download, ExternalLink, XCircle } from "lucide-react";
+import { Certificate, JobDetail as JobDetailType, bulkDownloadUrl, downloadUrl } from "../lib/api";
+import { StatusBadge } from "../components/StatusBadge";
+export function JobDetail({ job, loading, onBack, onRefresh }: { job: JobDetailType | null; loading: boolean; onBack: () => void; onRefresh: () => void }) {
+  useEffect(() => { if (job && ["queued","processing"].includes(job.status)) { const timer = setInterval(onRefresh, 1200); return () => clearInterval(timer); } }, [job?.status, onRefresh]);
+  if (loading || !job) return <section className="page"><button className="back" onClick={onBack}><ArrowLeft size={17}/> Back to dashboard</button><div className="card empty">Loading generation job...</div></section>;
+  const finished = job.success_count + job.failed_count;
+  return <section className="page"><button className="back" onClick={onBack}><ArrowLeft size={17}/> Back to dashboard</button><div className="hero-row compact"><div><p className="eyebrow">GENERATION JOB</p><h1>{job.event_name}</h1><p className="lede">{job.issuer_name} · Created {new Date(job.created_at).toLocaleString()}</p></div><div className="button-row"><StatusBadge status={job.status}/>{job.success_count > 0 && <a className="secondary link-button" href={bulkDownloadUrl(job.id)}><Download size={17}/> Download all</a>}</div></div>
+    <div className="progress-card"><div className="progress-top"><div><span>Overall progress</span><strong>{finished} / {job.total_count}</strong></div><strong>{job.progress_percent}%</strong></div><div className="progress"><span style={{width:`${job.progress_percent}%`}}/></div><div className="mini-stats"><span><CheckCircle2 size={15}/> {job.success_count} completed</span><span><XCircle size={15}/> {job.failed_count} failed</span><span>{job.total_count - finished} remaining</span></div></div>
+    <div className="card"><div className="card-head"><div><h2>Certificate results</h2><p className="muted">Each recipient is isolated so one failure does not stop the rest.</p></div></div><div className="table-wrap"><table><thead><tr><th>Recipient</th><th>ID</th><th>Status</th><th></th></tr></thead><tbody>{job.certificates.map(c => <CertificateRow key={c.id} cert={c}/>)}</tbody></table></div></div>
+  </section>
+}
+function CertificateRow({cert}: {cert: Certificate}) { return <tr><td><strong>{cert.name}</strong><small>{cert.email}{cert.organization ? ` · ${cert.organization}` : ""}</small></td><td><code>{cert.certificate_code}</code></td><td><StatusBadge status={cert.status}/>{cert.error_message && <small className="error-text">{cert.error_message}</small>}</td><td>{cert.download_url ? <a className="table-link" href={downloadUrl(cert.id)} target="_blank"><ExternalLink size={16}/> PDF</a> : ""}</td></tr> }
