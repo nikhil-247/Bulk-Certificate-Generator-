@@ -23,6 +23,12 @@ def test_health():
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
 
+def test_validation_rejects_invalid_recipient_email():
+    payload = sample_payload()
+    payload["recipients"][0]["email"] = "not-an-email"
+    response = client.post("/api/v1/jobs", json=payload)
+    assert response.status_code == 422
+
 def test_validation_rejects_duplicate_emails():
     payload = sample_payload()
     payload["recipients"][1]["email"] = "AARAV@example.com"
