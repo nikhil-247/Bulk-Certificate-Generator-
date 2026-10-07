@@ -13,7 +13,7 @@ export type Certificate = {
   completed_at?: string | null;
   download_url?: string | null;
 };
-export type JobDetail = Job & { certificates: Certificate[] };
+export type JobDetail = Job & { certificates: Certificate[]; progress_percent: number };
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API}${path}`, { headers: { "Content-Type": "application/json", ...(init?.headers || {}) }, ...init });
